@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cerrame la 8 · Base colaborativa inmobiliaria</title>
+
+<style>
+:root{
+  --bg:#f3efe6; --paper:#fffdf8; --ink:#1f2a25; --muted:#69736d;
+  --accent:#203c31; --soft:#e8eee9; --line:#ddd7cb; --danger:#8c3434;
+  --shadow:0 12px 38px rgba(31,42,37,.08);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink)}
+header{position:sticky;top:0;z-index:10;background:rgba(255,253,248,.94);border-bottom:1px solid var(--line);backdrop-filter:blur(12px)}
+.wrap{max-width:1280px;margin:auto;padding:20px 24px}
+.brand{display:flex;justify-content:space-between;gap:18px;align-items:center}
+h1{font-family:Georgia,serif;margin:0;font-size:28px}
+.sub{font-size:13px;color:var(--muted);margin-top:4px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button,.btn{border:0;border-radius:11px;padding:10px 14px;background:var(--accent);color:#fff;font-weight:650;cursor:pointer}
+.secondary{background:var(--soft);color:var(--ink);border:1px solid var(--line)}
+.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.danger{background:#f7eaea;color:var(--danger);border:1px solid #e6c5c5}
+main.wrap{padding-top:24px;padding-bottom:48px}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:18px}
+.metric{grid-column:span 3}.metric b{display:block;font-size:28px;margin-top:8px}.metric span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.filters,.tablecard{grid-column:span 12}
+.row{display:grid;grid-template-columns:repeat(12,1fr);gap:10px}
+.c2{grid-column:span 2}.c3{grid-column:span 3}.c4{grid-column:span 4}.c6{grid-column:span 6}.c12{grid-column:span 12}
+label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+input,select,textarea{width:100%;border:1px solid var(--line);background:#fff;border-radius:11px;padding:10px 11px;color:var(--ink)}
+textarea{min-height:86px;resize:vertical}
+.small{font-size:12px;color:var(--muted)}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:10px 0 16px}
+.scroll{overflow:auto;max-height:580px}
+table{border-collapse:collapse;width:100%;min-width:1700px}
+th,td{padding:10px;border-bottom:1px solid var(--line);font-size:13px;text-align:left;vertical-align:top}
+th{position:sticky;top:0;background:#faf7f0;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);z-index:2}
+.pill{display:inline-block;border-radius:999px;padding:4px 8px;background:var(--soft);font-size:11px}
+.empty{text-align:center;padding:40px;color:var(--muted)}
+.hidden{display:none!important}
+.login{max-width:480px;margin:8vh auto}
+.login h2{font-family:Georgia,serif;font-size:28px;margin:0 0 8px}
+.notice{background:#f6f1e8;border:1px solid var(--line);padding:12px;border-radius:12px;font-size:12px;color:var(--muted)}
+dialog{border:0;border-radius:18px;padding:0;width:min(1020px,calc(100% - 26px));box-shadow:0 30px 90px rgba(0,0,0,.25)}
+dialog::backdrop{background:rgba(0,0,0,.35)}
+.modalhead,.modalfoot{padding:17px 20px;background:var(--paper);display:flex;justify-content:space-between;align-items:center;gap:10px}
+.modalhead{border-bottom:1px solid var(--line)}.modalfoot{border-top:1px solid var(--line);justify-content:flex-end}
+.modalbody{padding:20px;background:var(--bg);max-height:78vh;overflow:auto}
+@media(max-width:900px){.metric{grid-column:span 6}.c2,.c3,.c4,.c6{grid-column:span 12}.brand{align-items:flex-start;flex-direction:column}}
+@media(max-width:520px){.metric{grid-column:span 12}.wrap{padding-left:14px;padding-right:14px}}
+</style>
+</head>
+<body>
+<header id="appHeader" class="hidden">
+  <div class="wrap brand">
+    <div>
+      <h1>Cerrame la 8</h1>
+      <div class="sub">Base colaborativa de operaciones formalizadas en CABA · comparables reales, negociación y valor por m² para tasaciones fundamentadas y actualizadas sobre lo que efectivamente convalida el mercado.</div>
+    </div>
+    <div class="actions">
+      <span class="small" id="who"></span>
+      <button id="newBtn">+ Cargar operación</button>
+      <button class="secondary" id="exportBtn">Exportar CSV</button>
+      <button class="ghost" id="logoutBtn">Salir</button>
+    </div>
+  </div>
+</header>
+
+<section id="loginView" class="wrap">
+  <div class="card login">
+    <h2>Entrar a Cerrame la 8</h2>
+    <p class="small">Ingresá tu email. Vas a recibir un enlace de acceso sin contraseña.</p>
+    <label>Email</label>
+    <input id="loginEmail" type="email" placeholder="colega@inmobiliaria.com">
+    <div style="height:10px"></div>
+    <button id="loginBtn" style="width:100%">Enviar enlace de acceso</button>
+    <div style="height:12px"></div>
+    <div class="notice">Cerrame la 8 es una base privada y colaborativa entre colegas. Cada operación registra quién la aportó; no se solicita unidad funcional y el piso exacto no aparece en la grilla compartida.</div>
+    <p class="small" id="loginMsg"></p>
+  </div>
+</section>
+
+<main id="appView" class="wrap hidden">
+<div class="notice" style="margin-bottom:16px"><b>MODO DEMO</b> · Podés cargar, editar, borrar, filtrar y exportar operaciones. Lo que cargues queda guardado sólo en este navegador.</div>
+  <div style="margin-bottom:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+  <span class="pill" style="background:var(--accent);color:white;padding:7px 11px;font-weight:700">Ámbito · CABA</span>
+  <span class="small">La base reúne exclusivamente operaciones formalizadas en la Ciudad Autónoma de Buenos Aires.</span>
+</div>
+<section class="grid">
+    <div class="card metric"><span>Operaciones</span><b id="mCount">0</b><div class="small">según filtros actuales</div></div>
+    <div class="card metric"><span>Mediana USD/m² homog.</span><b id="mMedian">—</b><div class="small">cub. 100% · semi. 70% · desc. 33%</div></div>
+    <div class="card metric"><span>Descuento mediano</span><b id="mDiscount">—</b><div class="small">último publicado vs. cierre</div></div>
+    <div class="card metric"><span>Días medianos</span><b id="mDays">—</b><div class="small">publicación a cierre</div></div>
+    <div class="card filters">
+      <div class="row">
+        <div class="c3"><label>Barrio</label><select id="fBarrio"><option value="">Todos</option></select></div>
+        <div class="c3"><label>Tipología</label><select id="fTipo"><option value="">Todas</option><option>Departamento</option><option>PH</option><option>Casa</option><option>Local</option><option>Oficina</option><option>Terreno</option></select></div>
+        <div class="c2"><label>Ambientes</label><select id="fAmb"><option value="">Todos</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5+</option></select></div>
+        <div class="c2"><label>Desde</label><input id="fDesde" type="date"></div>
+        <div class="c2"><label>Hasta</label><input id="fHasta" type="date"></div>
+        <div class="c6"><label>Buscar</label><input id="fText" placeholder="Dirección, observación, colega, referencia…"></div>
+        <div class="c6" style="display:flex;align-items:end"><button id="clearFilters" class="secondary">Limpiar filtros</button></div>
+      </div>
+    </div>
+
+    <div class="card tablecard">
+      <div class="toolbar">
+        <div><b>Operaciones cerradas</b><div class="small" id="shownCount"></div></div>
+        <div class="small">Datos sincronizados en una única base</div>
+      </div>
+      <div class="scroll">
+        <table>
+          <thead><tr>
+            <th>Fecha</th><th>Barrio</th><th>Ubicación</th><th>Rango piso</th><th>Acceso</th><th>Tipo</th><th>Amb.</th>
+            <th>Cub.</th><th>Semi.</th><th>Desc.</th><th>Total</th><th>Luz</th><th>Estado</th><th>Edificio</th>
+            <th>Publicado</th><th>Cierre</th><th>USD/m² homog.</th><th>Desc.</th><th>Días</th><th>Aportó</th><th></th>
+          </tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+        <div id="empty" class="empty">Todavía no hay operaciones cargadas.</div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer style="border-top:1px solid var(--line);background:var(--paper);margin-top:20px">
+  <div class="wrap" style="text-align:center">
+    <div style="font-family:Georgia,serif;font-size:18px">Cerrame la 8</div>
+    <div class="small" style="margin-top:5px;max-width:850px;margin-left:auto;margin-right:auto;line-height:1.55">Una herramienta creada por <b>Jimena Amaya Relaciones Inmobiliarias · CUCICBA 9548</b> para compartir entre colegas información de valor sobre operaciones formalizadas en la Ciudad Autónoma de Buenos Aires, contribuir a un ejercicio profesional prolijo y construir tasaciones apoyadas en evidencia real de mercado.</div>
+    <div class="small" style="margin-top:7px">Consultas, dudas o aportes · 11 7018-4686 · info@jimeamaya.com</div>
+  </div>
+</footer>
+
+<dialog id="dlg">
+<form id="form">
+<div class="modalhead"><div><b id="dlgTitle">Nueva operación</b><div class="small">Una buena base se construye con pocos datos, pero comparables.</div></div><button type="button" class="ghost" id="closeDlg">Cerrar</button></div>
+<div class="modalbody"><div class="card"><div class="row">
+<input type="hidden" id="id">
+
+<div class="c3"><label>Fecha de publicación</label><input id="fecha_pub" type="date"></div>
+<div class="c3"><label>Fecha de cierre *</label><input id="fecha_cierre" type="date" required></div>
+<div class="c3"><label>Barrio *</label><input id="barrio" required></div>
+<div class="c3"><label>Dirección *</label><input id="direccion" placeholder="Defensa 900" required></div>
+
+<div class="c2"><label>Piso exacto</label><input id="piso_exacto" type="number" min="0" max="80"></div>
+<div class="c3"><label>Rango de pisos</label><select id="rango_piso"><option value="">Sin informar</option><option>PB</option><option>1° a 3°</option><option>4° a 6°</option><option>7° a 10°</option><option>11° o más</option></select></div>
+<div class="c3"><label>Acceso *</label><select id="acceso"><option>Ascensor</option><option>Escalera</option><option>Ascensor + escalera</option><option>PB / acceso directo</option></select></div>
+<div class="c4"><label>Antigüedad</label><select id="antiguedad"><option value="">Sin informar</option><option>0–10 años</option><option>11–30 años</option><option>31–50 años</option><option>51–80 años</option><option>Más de 80 años</option></select></div>
+
+<div class="c3"><label>Tipología *</label><select id="tipo"><option>Departamento</option><option>PH</option><option>Casa</option><option>Local</option><option>Oficina</option><option>Terreno</option></select></div>
+<div class="c2"><label>Ambientes</label><input id="ambientes" type="number" min="0" max="20"></div>
+<div class="c2"><label>Cubiertos m² *</label><input id="m2_cub" type="number" min="0" step="0.01" required></div>
+<div class="c2"><label>Semicubiertos m²</label><input id="m2_semi" type="number" min="0" step="0.01"></div>
+<div class="c2"><label>Descubiertos m²</label><input id="m2_desc" type="number" min="0" step="0.01"></div>
+<div class="c2"><label>Totales m² · cálculo automático</label><input id="m2_total" type="number" min="0" step="0.01" readonly style="background:#f3f0e9;font-weight:700"></div>
+
+<div class="c3"><label>Estado unidad *</label><select id="estado_unidad"><option>Excelente</option><option>Muy bueno</option><option>Bueno</option><option>A actualizar</option><option>A refaccionar</option></select></div>
+<div class="c3"><label>Estado edificio</label><select id="estado_edificio"><option value="">Sin informar</option><option>Excelente</option><option>Muy bueno</option><option>Bueno</option><option>Regular</option><option>A mejorar</option></select></div>
+<div class="c3"><label>Disposición</label><select id="disposicion"><option value="">Sin informar</option><option>Frente</option><option>Contrafrente</option><option>Interno</option><option>Lateral</option></select></div>
+<div class="c3"><label>Luminosidad</label><select id="luminosidad"><option value="">Sin informar</option><option>Muy luminoso</option><option>Luminoso</option><option>Luminosidad media</option><option>Poco luminoso</option></select></div>
+
+<div class="c3"><label>Orientación</label><select id="orientacion"><option value="">Sin informar</option><option>Norte</option><option>Sur</option><option>Este</option><option>Oeste</option><option>Noreste</option><option>Noroeste</option><option>Sudeste</option><option>Sudoeste</option></select></div>
+<div class="c3"><label>Vista</label><select id="vista"><option value="">Sin informar</option><option>Abierta</option><option>Urbana</option><option>Pulmón</option><option>Sin vista relevante</option></select></div>
+<div class="c2"><label>Balcón</label><select id="balcon"><option>No</option><option>Sí</option></select></div>
+<div class="c2"><label>Terraza</label><select id="terraza"><option>No</option><option>Sí</option></select></div>
+<div class="c2"><label>Cochera</label><select id="cochera"><option>No</option><option>Sí</option></select></div>
+
+<div class="c3"><label>Apto profesional</label><select id="apto_prof"><option value="">Sin informar</option><option>Sí</option><option>No</option></select></div>
+<div class="c3"><label>Dependencia</label><select id="dependencia"><option value="">Sin informar</option><option>Sí</option><option>No</option></select></div>
+<div class="c3"><label>Protección patrimonial</label><select id="patrimonial"><option>No se sabe</option><option>Sí</option><option>No</option></select></div>
+<div class="c3"><label>Expensas aprox. al cierre ARS</label><input id="expensas_ars" type="number" min="0"></div>
+<div class="c12"><label>Amenities</label><input id="amenities" placeholder="Pileta, SUM, seguridad, laundry…"></div>
+
+<div class="c12 notice" style="background:#fff7df;border-color:#dfc77d;color:var(--ink);font-size:13px"><b>IMPORTANTE · Al cargar precios, no agregar puntos ni separadores de miles.</b> Ejemplo: para USD 120.000 ingresar <b>120000</b>.</div>
+<div class="c4"><label>Precio publicación USD *</label><input id="precio_publicacion" type="number" min="0" required></div>
+<div class="c4"><label>Último publicado USD</label><input id="ultimo_publicado" type="number" min="0"></div>
+<div class="c4"><label>Precio de cierre USD *</label><input id="precio_cierre" type="number" min="0" required></div>
+<div class="c4"><label>Cantidad de ajustes de precio</label><input id="ajustes_precio" type="number" min="0" value="0"></div>
+<div class="c4"><label>Fuente / colega</label><input id="fuente" placeholder="Nombre o iniciales"></div>
+<div class="c4"><label>Verificación</label><select id="verificacion"><option>Informada por colega</option><option>Operación propia</option><option>Documentación verificada</option></select></div>
+<div class="c4"><label>Referencia interna</label><input id="referencia"></div>
+<div class="c12"><label>Observaciones</label><textarea id="observaciones"></textarea></div>
+<div class="c12 notice">No se solicita UF. El piso exacto queda guardado para análisis, pero la grilla general muestra sólo el rango de pisos.</div>
+</div></div></div>
+<div class="modalfoot"><button type="button" class="secondary" id="cancelDlg">Cancelar</button><button type="submit">Guardar operación</button></div>
+</form>
+</dialog>
+
+<script>
+const $=id=>document.getElementById(id);
+const KEY='cerramela8_demo_v1';
+const DEMO_USER={id:'jimena-demo',email:'info@jimeamaya.com',user_metadata:{full_name:'Jimena Amaya'}};
+let user=DEMO_USER, rows=[];
+const money=n=>n?new Intl.NumberFormat('es-AR',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(n):'—';
+const num=n=>new Intl.NumberFormat('es-AR',{maximumFractionDigits:1}).format(n);
+const esc=s=>(s??'').toString().replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+const median=a=>{if(!a.length)return null;const s=[...a].sort((x,y)=>x-y),m=Math.floor(s.length/2);return s.length%2?s[m]:(s[m-1]+s[m])/2};
+function calc(r){
+ const homog=(+r.m2_cub||0)+(+r.m2_semi||0)*.70+(+r.m2_desc||0)*.33;
+ const sqmHomog=homog>0?(+r.precio_cierre||0)/homog:null;
+ const base=(+r.ultimo_publicado||+r.precio_publicacion||0);
+ const disc=base>0?(1-(+r.precio_cierre||0)/base)*100:null;
+ let days=null;
+ if(r.fecha_pub&&r.fecha_cierre)days=Math.max(0,Math.round((new Date(r.fecha_cierre+'T00:00:00')-new Date(r.fecha_pub+'T00:00:00'))/86400000));
+ return {homog,sqmHomog,disc,days};
+}
+function saveLocal(){localStorage.setItem(KEY,JSON.stringify(rows))}
+function loadLocal(){try{rows=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){rows=[]}}
+
+function actualizarTotalM2(){
+  const cub=+$('m2_cub').value||0, semi=+$('m2_semi').value||0, desc=+$('m2_desc').value||0;
+  $('m2_total').value=(cub+semi+desc).toFixed(2).replace(/\.00$/,'');
+}
+['m2_cub','m2_semi','m2_desc'].forEach(id=>$(id).addEventListener('input',actualizarTotalM2));
+
+function filtered(){
+ const b=$('fBarrio').value,t=$('fTipo').value,a=$('fAmb').value,ds=$('fDesde').value,de=$('fHasta').value,q=$('fText').value.trim().toLowerCase();
+ return rows.filter(r=>{
+  if(b&&r.barrio!==b)return false;if(t&&r.tipo!==t)return false;
+  if(a&&(a==='5+'?(+r.ambientes<5):(String(r.ambientes)!==a)))return false;
+  if(ds&&r.fecha_cierre<ds)return false;if(de&&r.fecha_cierre>de)return false;
+  if(q&&!JSON.stringify(r).toLowerCase().includes(q))return false;return true;
+ }).sort((x,y)=>(y.fecha_cierre||'').localeCompare(x.fecha_cierre||''));
+}
+function refreshBarrios(){
+ const prev=$('fBarrio').value, barrios=[...new Set(rows.map(x=>x.barrio).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+ $('fBarrio').innerHTML='<option value="">Todos</option>'+barrios.map(b=>`<option>${esc(b)}</option>`).join('');
+ $('fBarrio').value=barrios.includes(prev)?prev:'';
+}
+function render(){
+ refreshBarrios(); const data=filtered();
+ $('shownCount').textContent=`${data.length} registro${data.length===1?'':'s'}`;
+ $('empty').style.display=data.length?'none':'block';
+ $('tbody').innerHTML=data.map(r=>{const c=calc(r);return `<tr>
+ <td>${esc(r.fecha_cierre||'')}</td><td><span class="pill">${esc(r.barrio)}</span></td><td><b>${esc(r.direccion)}</b></td>
+ <td>${esc(r.rango_piso||'—')}</td><td>${esc(r.acceso||'—')}</td><td>${esc(r.tipo)}</td><td>${esc(r.ambientes||'—')}</td>
+ <td>${r.m2_cub?num(r.m2_cub):'—'}</td><td>${r.m2_semi?num(r.m2_semi):'—'}</td><td>${r.m2_desc?num(r.m2_desc):'—'}</td><td>${r.m2_total?num(r.m2_total):'—'}</td>
+ <td>${esc(r.luminosidad||'—')}</td><td>${esc(r.estado_unidad||'—')}</td><td>${esc(r.estado_edificio||'—')}</td>
+ <td>${money(r.precio_publicacion)}</td><td><b>${money(r.precio_cierre)}</b></td><td>${c.sqmHomog?money(c.sqmHomog):'—'}</td>
+ <td>${c.disc!=null?c.disc.toFixed(1)+'%':'—'}</td><td>${c.days!=null?c.days:'—'}</td><td>Jimena Amaya</td>
+ <td><div class="actions"><button class="ghost" onclick="editRow('${r.id}')">Editar</button><button class="danger" onclick="delRow('${r.id}')">Eliminar</button></div></td></tr>`}).join('');
+ const hom=data.map(r=>calc(r).sqmHomog).filter(Boolean), dis=data.map(r=>calc(r).disc).filter(v=>v!=null), days=data.map(r=>calc(r).days).filter(v=>v!=null);
+ $('mCount').textContent=data.length;$('mMedian').textContent=median(hom)?money(median(hom)):'—';
+ $('mDiscount').textContent=median(dis)!=null?median(dis).toFixed(1)+'%':'—';$('mDays').textContent=median(days)!=null?Math.round(median(days)):'—';
+}
+function openForm(r={}){
+ $('dlgTitle').textContent=r.id?'Editar operación':'Nueva operación';
+ const fields=['id','fecha_pub','fecha_cierre','barrio','direccion','piso_exacto','rango_piso','acceso','antiguedad','tipo','ambientes','m2_cub','m2_semi','m2_desc','m2_total','estado_unidad','estado_edificio','disposicion','luminosidad','orientacion','vista','balcon','terraza','cochera','apto_prof','dependencia','patrimonial','expensas_ars','amenities','precio_publicacion','ultimo_publicado','precio_cierre','ajustes_precio','fuente','verificacion','referencia','observaciones'];
+ fields.forEach(k=>{if($(k))$(k).value=r[k]??({acceso:'Ascensor',tipo:'Departamento',estado_unidad:'Bueno',balcon:'No',terraza:'No',cochera:'No',patrimonial:'No se sabe',ajustes_precio:0,verificacion:'Operación propia'}[k]??'')});
+ if(!r.id)$('fecha_cierre').value=new Date().toISOString().slice(0,10);actualizarTotalM2();$('dlg').showModal();
+}
+window.editRow=id=>openForm(rows.find(x=>x.id===id)||{});
+window.delRow=id=>{if(!confirm('¿Eliminar esta operación?'))return;rows=rows.filter(x=>x.id!==id);saveLocal();render()}
+$('form').addEventListener('submit',e=>{
+ e.preventDefault();
+ const fields=['fecha_pub','fecha_cierre','barrio','direccion','piso_exacto','rango_piso','acceso','antiguedad','tipo','ambientes','m2_cub','m2_semi','m2_desc','m2_total','estado_unidad','estado_edificio','disposicion','luminosidad','orientacion','vista','balcon','terraza','cochera','apto_prof','dependencia','patrimonial','expensas_ars','amenities','precio_publicacion','ultimo_publicado','precio_cierre','ajustes_precio','fuente','verificacion','referencia','observaciones'];
+ const rec={};fields.forEach(k=>rec[k]=$(k).value||null);
+ ['piso_exacto','ambientes','m2_cub','m2_semi','m2_desc','m2_total','expensas_ars','precio_publicacion','ultimo_publicado','precio_cierre','ajustes_precio'].forEach(k=>rec[k]=rec[k]===null?null:+rec[k]);
+ const id=$('id').value;rec.id=id||('demo-'+Date.now());rec.created_by=user.id;rec.aportante_email=user.email;rec.aportante_nombre='Jimena Amaya';
+ if(id){const i=rows.findIndex(x=>x.id===id);if(i>=0)rows[i]=rec}else rows.push(rec);
+ saveLocal();$('dlg').close();render();
+});
+$('newBtn').onclick=()=>openForm();$('closeDlg').onclick=$('cancelDlg').onclick=()=>$('dlg').close();
+$('logoutBtn').style.display='none';
+['fBarrio','fTipo','fAmb','fDesde','fHasta','fText'].forEach(id=>$(id).addEventListener(id==='fText'?'input':'change',render));
+$('clearFilters').onclick=()=>{['fBarrio','fTipo','fAmb','fDesde','fHasta','fText'].forEach(id=>$(id).value='');render()};
+$('exportBtn').onclick=()=>{
+ const data=filtered(),heads=['fecha_pub','fecha_cierre','barrio','direccion','piso_exacto','rango_piso','acceso','antiguedad','tipo','ambientes','m2_cub','m2_semi','m2_desc','m2_total','estado_unidad','estado_edificio','disposicion','luminosidad','orientacion','vista','balcon','terraza','cochera','apto_prof','dependencia','patrimonial','expensas_ars','amenities','precio_publicacion','ultimo_publicado','precio_cierre','ajustes_precio','fuente','verificacion','referencia','observaciones'];
+ const csv=[heads.join(',')].concat(data.map(r=>heads.map(h=>`"${String(r[h]??'').replaceAll('"','""')}"`).join(','))).join('\n');
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}));a.download='cerramela8_demo.csv';a.click();
+};
+$('loginView').classList.add('hidden');$('appView').classList.remove('hidden');$('appHeader').classList.remove('hidden');
+$('who').textContent='MODO DEMO · Jimena Amaya';
+loadLocal();render();
+</script>
+</body>
+</html>
